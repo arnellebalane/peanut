@@ -2,12 +2,12 @@
     let token;
 
 
-    const subscribeToServerSentEvents = url => {
-        const server = new EventSource(url);
+    const subscribeToServerSentEvents = _ => {
+        const server = new EventSource('/eventsource');
 
         server.addEventListener('subscribe', e => token = e.data);
     };
 
 
-    subscribeToServerSentEvents('/eventsource');
+    subscribeToServerSentEvents();
 })();
