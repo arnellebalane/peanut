@@ -2,7 +2,7 @@
   "name": "videocall-webrtc",
   "version": "0.0.0",
   "description": "Video-calling application for the web using WebRTC",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "./node_modules/.bin/nodemon server.js"

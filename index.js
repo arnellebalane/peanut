@@ -5,7 +5,6 @@ const winston = require('winston');
 const consolidate = require('consolidate');
 const config = require('./config');
 
-
 const app = express();
 
 app.engine('html', consolidate.nunjucks);
@@ -15,4 +14,4 @@ app.use(morgan('dev'));
 app.use(require('./lib/routes'));
 
 app.listen(config.get('PORT'),
-    _ => winston.info(`Server is now running at port ${config.get('PORT')}`));
+    () => winston.info(`Server is now running at port ${config.get('PORT')}`));
