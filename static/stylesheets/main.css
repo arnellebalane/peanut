@@ -12,3 +12,8 @@ html {
 body {
     height: 100vh;
 }
+
+video {
+    display: block;
+    width: 10rem;
+}
