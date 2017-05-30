@@ -4,14 +4,16 @@
   "description": "Video-calling application for the web using WebRTC",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./node_modules/.bin/nodemon server.js"
+    "start": "node index.js",
+    "dev": "./node_modules/.bin/nodemon index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/arnellebalane/videocall-webrtc.git"
   },
-  "keywords": [],
+  "keywords": [
+    "webrtc"
+  ],
   "author": "Arnelle Balane <arnellebalane@gmail.com> (https://arnellebalane.com)",
   "license": "MIT",
   "bugs": {
@@ -19,13 +21,14 @@
   },
   "homepage": "https://github.com/arnellebalane/videocall-webrtc#readme",
   "dependencies": {
-    "body-parser": "^1.15.2",
     "consolidate": "^0.14.5",
-    "express": "^4.14.0",
-    "morgan": "^1.7.0",
+    "express": "^4.15.3",
+    "morgan": "^1.8.2",
     "nconf": "^0.8.4",
-    "nodemon": "^1.11.0",
-    "nunjucks": "^3.0.0",
-    "winston": "^2.3.0"
+    "nunjucks": "^3.0.1",
+    "winston": "^2.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
   }
 }
