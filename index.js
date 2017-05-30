@@ -46,4 +46,15 @@ io.on('connection', (socket) => {
     socket.on('peeranswer', ({ peerId, data }) => {
         clients[peerId].emit('peeranswer', { peerId: socketId, data });
     });
+
+    socket.on('peericecandidate', ({ peerId, data }) => {
+        clients[peerId].emit('peericecandidate', { peerId: socketId, data });
+    });
+
+    socket.on('disconnect', () => {
+        delete clients[socketId];
+        for (let key in clients) {
+            clients[key].emit('peerdisconnect', socketId);
+        }
+    });
 });
