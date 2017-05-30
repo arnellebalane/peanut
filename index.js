@@ -5,6 +5,7 @@ const socketio = require('socket.io');
 const morgan = require('morgan');
 const winston = require('winston');
 const consolidate = require('consolidate');
+const uuid = require('uuid');
 const config = require('./config');
 
 const app = express();
@@ -24,8 +25,25 @@ server.listen(config.get('PORT'),
     () => winston.info(`Server is now running at port ${config.get('PORT')}`));
 
 const io = socketio(server);
-const clients = [];
+const clients = {};
 
 io.on('connection', (socket) => {
-    clients.push(socket);
+    const socketId = uuid();
+    clients[socketId] = socket;
+
+    if (Object.keys(clients).length > 1) {
+        for (let key in clients) {
+            if (key !== socketId) {
+                socket.emit('peerconnect', key);
+            }
+        }
+    }
+
+    socket.on('peeroffer', ({ peerId, data }) => {
+        clients[peerId].emit('peeroffer', { peerId: socketId, data });
+    });
+
+    socket.on('peeranswer', ({ peerId, data }) => {
+        clients[peerId].emit('peeranswer', { peerId: socketId, data });
+    });
 });
