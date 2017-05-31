@@ -21,7 +21,7 @@ body {
 
 div {
     position: relative;
-    width: calc((100% - 2rem * 4) / 4);
+    width: 100%;
     margin: 1rem;
 }
 
@@ -40,8 +40,8 @@ video {
     background-color: #000;
 }
 
-@media (max-width: 500px) {
+@media all and (min-width: 500px), (min-device-width: 500px) {
     div {
-        width: calc((100 - 2rem * 2) / 2);
+        width: calc((100% - 2rem * 4) / 4);
     }
 }
