@@ -18,7 +18,9 @@ const displayMediaStream = (mediaStream, key='self') => {
     video.srcObject = mediaStream;
     video.autoplay = true;
     video.dataset.key = key;
-    document.body.appendChild(video);
+    const div = document.createElement('div');
+    div.appendChild(video);
+    document.body.appendChild(div);
 };
 
 const setupPeerConnection = async (peerId) => {
