@@ -22,7 +22,16 @@ const displayMediaStream = (mediaStream, key='self') => {
 };
 
 const setupPeerConnection = async (peerId) => {
-    const connection = new RTCPeerConnection();
+    const configuration = {
+        iceServers: [{
+            url: 'stun:stun.l.google.com:19302'
+        }, {
+            url: 'turn:playground.arnellebalane.com:3478',
+            username: 'arnelle-turn',
+            credential: 'arnellepass-turn'
+        }]
+    };
+    const connection = new RTCPeerConnection(configuration);
     peers[peerId] = connection;
 
     const mediaStream = await getMediaStream();
