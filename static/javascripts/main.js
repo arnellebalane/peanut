@@ -1,98 +1,81 @@
 const socket = io('/');
+const peers = {};
 
-(async () => {
-    const peers = {};
+const getMediaStream = (() => {
+    const constraints = { video: true };
+    let mediaStream = null;
 
-    socket.on('peerconnect', async (peerId) => {
-        const connection = new RTCPeerConnection();
-
-        const mediaStream = await getMediaStream();
-        if (!document.querySelector('video:not([data-key])')) {
-            displayMediaStream(mediaStream);
+    return async () => {
+        if (!mediaStream) {
+            mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
         }
-        connection.addStream(mediaStream);
-        connection.onaddstream = (e) => displayMediaStream(e.stream, peerId);
-
-        connection.onicecandidate = (e) => {
-            socket.emit('peericecandidate', {
-                peerId: peerId,
-                data: JSON.stringify({ candidate: e.candidate })
-            });
-        };
-
-        const offerDescription = await connection.createOffer();
-        connection.setLocalDescription(offerDescription);
-        peers[peerId] = connection;
-        socket.emit('peeroffer', {
-            peerId: peerId,
-            data: JSON.stringify({ sdp: offerDescription })
-        });
-    });
-
-    socket.on('peeroffer', async ({ peerId, data }) => {
-        data = JSON.parse(data);
-        const connection = new RTCPeerConnection();
-
-        const mediaStream = await getMediaStream();
-        if (!document.querySelector('video:not([data-key])')) {
-            displayMediaStream(mediaStream);
-        }
-        connection.addStream(mediaStream);
-        connection.onaddstream = (e) => displayMediaStream(e.stream, peerId);
-
-        connection.onicecandidate = (e) => {
-            socket.emit('peericecandidate', {
-                peerId: peerId,
-                data: JSON.stringify({ candidate: e.candidate })
-            });
-        };
-
-        connection.setRemoteDescription(new RTCSessionDescription(data.sdp));
-        const answerDescription = await connection.createAnswer(connection.remoteDescription);
-        connection.setLocalDescription(answerDescription);
-        peers[peerId] = connection;
-        socket.emit('peeranswer', {
-            peerId: peerId,
-            data: JSON.stringify({ sdp: answerDescription })
-        });
-        console.log('peeroffer');
-        console.log(connection);
-    });
-
-    socket.on('peeranswer', async ({ peerId, data }) => {
-        data = JSON.parse(data);
-        peers[peerId].setRemoteDescription(new RTCSessionDescription(data.sdp));
-        console.log('peeranswer');
-        console.log(peers[peerId]);
-    });
-
-    socket.on('peericecandidate', async ({ peerId, data }) => {
-        data = JSON.parse(data);
-        try {
-            peers[peerId].addIceCandidate(new RTCIceCandidate(data.candidate));
-        } catch (e) {
-            console.log(data);
-            console.error(e);
-        }
-    });
-
-    socket.on('peerdisconnect', (peerId) => {
-        delete peers[peerId];
-        document.querySelector(`video[data-key="${peerId}"]`).remove();
-    });
+        return mediaStream;
+    };
 })();
 
-async function getMediaStream() {
-    const constraints = { video: true };
-    return await navigator.mediaDevices.getUserMedia(constraints);
-}
-
-function displayMediaStream(mediaStream, key) {
+const displayMediaStream = (mediaStream, key='self') => {
     const video = document.createElement('video');
     video.srcObject = mediaStream;
     video.autoplay = true;
-    if (key) {
-        video.dataset.key = key;
-    }
+    video.dataset.key = key;
     document.body.appendChild(video);
-}
+};
+
+const setupPeerConnection = async (peerId) => {
+    const connection = new RTCPeerConnection();
+    peers[peerId] = connection;
+
+    const mediaStream = await getMediaStream();
+    const noLocalMediaStream = document.querySelector('video[data-key="self"]') === null;
+    if (noLocalMediaStream) {
+        displayMediaStream(mediaStream);
+    }
+    connection.addStream(mediaStream);
+    connection.onaddstream = (e) => displayMediaStream(e.stream, peerId);
+
+    connection.onicecandidate = (e) => {
+        const payload = { peerId, data: JSON.stringify({ candidate: e.candidate }) };
+        socket.emit('peericecandidate', payload);
+    };
+
+    return connection;
+};
+
+socket.on('peerconnect', async (peerId) => {
+    const connection = await setupPeerConnection(peerId);
+    const offer = await connection.createOffer();
+    await connection.setLocalDescription(offer);
+
+    const payload = { peerId, data: JSON.stringify({ sdp: offer }) };
+    socket.emit('peeroffer', payload);
+});
+
+socket.on('peeroffer', async ({ peerId, data }) => {
+    const connection = await setupPeerConnection(peerId);
+    const offer = new RTCSessionDescription(JSON.parse(data).sdp);
+    await connection.setRemoteDescription(offer);
+    const answer = await connection.createAnswer(offer);
+    await connection.setLocalDescription(answer);
+
+    const payload = { peerId, data: JSON.stringify({ sdp: answer }) };
+    socket.emit('peeranswer', payload);
+});
+
+socket.on('peeranswer', async ({ peerId, data }) => {
+    const answer = new RTCSessionDescription(JSON.parse(data).sdp);
+    peers[peerId].setRemoteDescription(answer);
+});
+
+socket.on('peericecandidate', async ({ peerId, data }) => {
+    const candidateData = JSON.parse(data).candidate;
+    const peer = peers[peerId];
+    if (candidateData && peer && peer.remoteDescription.type) {
+        const candidate = new RTCIceCandidate(candidateData);
+        peers[peerId].addIceCandidate(candidate);
+    }
+});
+
+socket.on('peerdisconnect', (peerId) => {
+    delete peers[peerId];
+    document.querySelector(`video[data-key="${peerId}"]`).remove();
+});
