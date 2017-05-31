@@ -2,7 +2,7 @@ const socket = io('/');
 const peers = {};
 
 const getMediaStream = (() => {
-    const constraints = { video: true };
+    const constraints = { video: { aspectRatio: 16 / 9 } };
     let mediaStream = null;
 
     return async () => {
