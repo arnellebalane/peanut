@@ -39,7 +39,8 @@ const setupPeerConnection = async (peerId) => {
             credential: 'arnellepass-turn'
         }]
     };
-    const connection = new RTCPeerConnection(configuration);
+    const PeerConnection = RTCPeerConnection || webkitRTCPeerConnection || mozRTCPeerConnection;
+    const connection = new PeerConnection(configuration);
     peers[peerId] = connection;
 
     const mediaStream = await getMediaStream();
