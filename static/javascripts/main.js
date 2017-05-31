@@ -17,9 +17,9 @@ const displayMediaStream = (mediaStream, key='self') => {
     const video = document.createElement('video');
     video.srcObject = mediaStream;
     video.autoplay = true;
-    video.dataset.key = key;
     const div = document.createElement('div');
     div.appendChild(video);
+    div.dataset.key = key;
     document.body.appendChild(div);
 };
 
@@ -37,7 +37,7 @@ const setupPeerConnection = async (peerId) => {
     peers[peerId] = connection;
 
     const mediaStream = await getMediaStream();
-    const noLocalMediaStream = document.querySelector('video[data-key="self"]') === null;
+    const noLocalMediaStream = document.querySelector('div[data-key="self"]') === null;
     if (noLocalMediaStream) {
         displayMediaStream(mediaStream);
     }
@@ -88,5 +88,5 @@ socket.on('peericecandidate', async ({ peerId, data }) => {
 
 socket.on('peerdisconnect', (peerId) => {
     delete peers[peerId];
-    document.querySelector(`video[data-key="${peerId}"]`).remove();
+    document.querySelector(`div[data-key="${peerId}"]`).remove();
 });
