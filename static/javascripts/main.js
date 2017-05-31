@@ -20,6 +20,9 @@ const displayMediaStream = (mediaStream, key='self') => {
     const video = document.createElement('video');
     video.srcObject = mediaStream;
     video.autoplay = true;
+    if (key === 'self') {
+        video.volume = 0;
+    }
     const div = document.createElement('div');
     div.appendChild(video);
     div.dataset.key = key;
