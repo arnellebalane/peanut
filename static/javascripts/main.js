@@ -16,16 +16,17 @@ const getMediaStream = (() => {
     };
 })();
 
-const displayMediaStream = (mediaStream, key='self') => {
+const displayMediaStream = (mediaStream, key=null) => {
     const video = document.createElement('video');
     video.srcObject = mediaStream;
     video.autoplay = true;
-    if (key === 'self') {
-        video.volume = 0;
-    }
     const div = document.createElement('div');
     div.appendChild(video);
-    div.dataset.key = key;
+    if (key) {
+        div.dataset.key = key;
+    } else {
+        video.volume = 0;
+    }
     document.body.appendChild(div);
 };
 
@@ -45,7 +46,7 @@ const setupPeerConnection = async (peerId) => {
     peers[peerId] = connection;
 
     const mediaStream = await getMediaStream();
-    const noLocalMediaStream = document.querySelector('div[data-key="self"]') === null;
+    const noLocalMediaStream = document.querySelector('div:not([data-key])') === null;
     if (noLocalMediaStream) {
         displayMediaStream(mediaStream);
     }
