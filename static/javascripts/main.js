@@ -1,4 +1,4 @@
-const socket = io('/');
+const socket = window.io('/');
 const peers = {};
 
 const PeerConnection = window.RTCPeerConnection
@@ -23,7 +23,7 @@ const getMediaStream = (() => {
     };
 })();
 
-const displayMediaStream = (mediaStream, key=null) => {
+const displayMediaStream = (mediaStream, key = null) => {
     const video = document.createElement('video');
     video.srcObject = mediaStream;
     video.autoplay = true;

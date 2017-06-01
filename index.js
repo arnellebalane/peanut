@@ -54,7 +54,9 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         delete clients[socketId];
         for (let key in clients) {
-            clients[key].emit('peerdisconnect', socketId);
+            if (key in clients) {
+                clients[key].emit('peerdisconnect', socketId);
+            }
         }
     });
 });
