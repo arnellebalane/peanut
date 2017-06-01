@@ -1,6 +1,13 @@
 const socket = io('/');
 const peers = {};
 
+const PeerConnection = window.RTCPeerConnection
+    || window.webkitRTCPeerConnection || window.mozRTCPeerConnection;
+const SessionDescription = window.RTCSessionDescription
+    || window.webkitRTCSessionDescription || window.mozRTCSessionDescription;
+const IceCandidate = window.RTCIceCandidate || window.webkitRTCIceCandidate
+    || window.mozRTCIceCandidate;
+
 const getMediaStream = (() => {
     const constraints = {
         video: { aspectRatio: 16 / 9 },
@@ -40,8 +47,6 @@ const setupPeerConnection = async (peerId) => {
             credential: 'arnellepass-turn'
         }]
     };
-    const PeerConnection = window.RTCPeerConnection
-        || window.webkitRTCPeerConnection || window.mozRTCPeerConnection;
     const connection = new PeerConnection(configuration);
     peers[peerId] = connection;
 
@@ -72,7 +77,7 @@ socket.on('peerconnect', async (peerId) => {
 
 socket.on('peeroffer', async ({ peerId, data }) => {
     const connection = await setupPeerConnection(peerId);
-    const offer = new RTCSessionDescription(JSON.parse(data).sdp);
+    const offer = new SessionDescription(JSON.parse(data).sdp);
     await connection.setRemoteDescription(offer);
     const answer = await connection.createAnswer(offer);
     await connection.setLocalDescription(answer);
@@ -82,7 +87,7 @@ socket.on('peeroffer', async ({ peerId, data }) => {
 });
 
 socket.on('peeranswer', async ({ peerId, data }) => {
-    const answer = new RTCSessionDescription(JSON.parse(data).sdp);
+    const answer = new SessionDescription(JSON.parse(data).sdp);
     peers[peerId].setRemoteDescription(answer);
 });
 
@@ -90,7 +95,7 @@ socket.on('peericecandidate', async ({ peerId, data }) => {
     const candidateData = JSON.parse(data).candidate;
     const peer = peers[peerId];
     if (candidateData && peer && peer.remoteDescription.type) {
-        const candidate = new RTCIceCandidate(candidateData);
+        const candidate = new IceCandidate(candidateData);
         peers[peerId].addIceCandidate(candidate);
     }
 });
