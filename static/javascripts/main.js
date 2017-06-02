@@ -140,5 +140,6 @@ socket.on('peerdisconnect', (peerId) => {
     $(`div[data-key="${peerId}"]`).remove();
     if (Object.keys(peers).length === 0) {
         $('.minimized-stream').remove();
+        getMediaStream().then(maximizeMediaStream);
     }
 });
