@@ -9,10 +9,7 @@ const IceCandidate = window.RTCIceCandidate || window.webkitRTCIceCandidate
     || window.mozRTCIceCandidate;
 
 const getMediaStream = (() => {
-    const constraints = {
-        video: { aspectRatio: 16 / 9 },
-        audio: true
-    };
+    const constraints = { video: true, audio: true };
     let mediaStream = null;
 
     return async () => {
@@ -23,19 +20,33 @@ const getMediaStream = (() => {
     };
 })();
 
-const displayMediaStream = (mediaStream, key = null) => {
+const createMediaStreamDislay = (mediaStream, muted) => {
     const video = document.createElement('video');
     video.srcObject = mediaStream;
     video.autoplay = true;
+    video.volume = muted ? 0 : 1;
     const div = document.createElement('div');
     div.appendChild(video);
-    if (key) {
-        div.dataset.key = key;
-    } else {
-        video.volume = 0;
-    }
-    document.body.appendChild(div);
+    return div;
 };
+
+const displayMediaStream = (mediaStream, key = null) => {
+    const display = createMediaStreamDislay(mediaStream, key === null);
+    display.classList.add('minimized-stream');
+    if (key) {
+        display.dataset.key = key;
+    }
+    document.querySelector('.minimized-streams-container')
+        .appendChild(display);
+};
+
+const displayMaximizedMediaStream = (mediaStream) => {
+    const display = createMediaStreamDislay(mediaStream, true);
+    display.classList.add('maximized-stream');
+    document.body.appendChild(display);
+};
+
+getMediaStream().then(displayMaximizedMediaStream);
 
 const setupPeerConnection = async (peerId) => {
     const configuration = {

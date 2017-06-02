@@ -10,38 +10,57 @@ html {
 }
 
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
     height: 100vh;
-    padding: 1rem;
     background-color: #111;
 }
 
-div {
-    position: relative;
-    width: 100%;
-    margin: 1rem;
-}
-
-div::before {
-    content: "";
-    display: block;
-    padding-top: calc(100% / 16 * 9);
-}
-
-video {
+.maximized-stream {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #000;
+    right: 0;
+    bottom: 0;
 }
 
-@media all and (min-width: 500px), (min-device-width: 500px) {
-    div {
-        width: calc((100% - 2rem * 4) / 4);
-    }
+.minimized-streams-container {
+    display: flex;
+    height: 15vh;
+    position: absolute;
+    left: 2rem;
+    right: 2rem;
+    bottom: 2rem;
+    z-index: 1;
+    border-radius: 5px;
+    overflow: auto;
+}
+
+.minimized-streams-container::-webkit-scrollbar {
+    display: none;
+}
+
+.minimized-stream {
+    flex-shrink: 0;
+    display: inline-block;
+    height: 100%;
+    padding: 1rem;
+    background-color: #222;
+}
+
+.minimized-stream:first-child {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.minimized-stream:last-child {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+video {
+    display: block;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0 auto;
+    background-color: #000;
 }
