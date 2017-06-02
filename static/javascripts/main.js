@@ -8,6 +8,8 @@ const SessionDescription = window.RTCSessionDescription
 const IceCandidate = window.RTCIceCandidate || window.webkitRTCIceCandidate
     || window.mozRTCIceCandidate;
 
+const $ = (selector) => document.querySelector(selector);
+
 const getMediaStream = (() => {
     const constraints = { video: true, audio: true };
     let mediaStream = null;
@@ -36,8 +38,7 @@ const displayMediaStream = (mediaStream, key = null) => {
     if (key) {
         display.dataset.key = key;
     }
-    document.querySelector('.minimized-streams-container')
-        .appendChild(display);
+    $('.minimized-streams-container').appendChild(display);
 };
 
 const displayMaximizedMediaStream = (mediaStream) => {
@@ -63,7 +64,7 @@ const setupPeerConnection = async (peerId) => {
 
     const mediaStream = await getMediaStream();
     const localMediaStreamSelector = '.minimized-stream:not([data-key])';
-    const noLocalMediaStream = document.querySelector(localMediaStreamSelector) === null;
+    const noLocalMediaStream = $(localMediaStreamSelector) === null;
     if (noLocalMediaStream) {
         displayMediaStream(mediaStream);
     }
@@ -114,8 +115,8 @@ socket.on('peericecandidate', async ({ peerId, data }) => {
 
 socket.on('peerdisconnect', (peerId) => {
     delete peers[peerId];
-    document.querySelector(`div[data-key="${peerId}"]`).remove();
+    $(`div[data-key="${peerId}"]`).remove();
     if (Object.keys(peers).length === 0) {
-        document.querySelector('.minimized-stream').remove();
+        $('.minimized-stream').remove();
     }
 });
