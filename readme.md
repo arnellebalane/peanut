@@ -1,7 +1,6 @@
-# VideoCall WebRTC
+# Peanut
 
-
-Video-calling application for the web using WebRTC.
+Video-calling application for the Web using WebRTC.
 
 
 ## License

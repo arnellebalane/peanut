@@ -1,5 +1,5 @@
 {
-  "name": "videocall-webrtc",
+  "name": "peanut",
   "version": "0.0.0",
   "description": "Video-calling application for the web using WebRTC",
   "main": "index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arnellebalane/videocall-webrtc.git"
+    "url": "git+https://github.com/arnellebalane/peanut.git"
   },
   "keywords": [
     "webrtc"
@@ -17,9 +17,9 @@
   "author": "Arnelle Balane <arnellebalane@gmail.com> (https://arnellebalane.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/arnellebalane/videocall-webrtc/issues"
+    "url": "https://github.com/arnellebalane/peanut/issues"
   },
-  "homepage": "https://github.com/arnellebalane/videocall-webrtc#readme",
+  "homepage": "https://github.com/arnellebalane/peanut#readme",
   "dependencies": {
     "consolidate": "^0.14.5",
     "express": "^4.15.3",
