@@ -8,7 +8,7 @@ const SessionDescription = window.RTCSessionDescription
 const IceCandidate = window.RTCIceCandidate || window.webkitRTCIceCandidate
     || window.mozRTCIceCandidate;
 
-const $ = (selector) => document.querySelector(selector);
+const $ = (selector, context = document) => context.querySelector(selector);
 
 const getMediaStream = (() => {
     const constraints = { video: true, audio: true };
@@ -37,6 +37,8 @@ const displayMediaStream = (mediaStream, key = null) => {
     display.classList.add('minimized-stream');
     if (key) {
         display.dataset.key = key;
+    } else {
+        display.classList.add('maximized');
     }
     $('.minimized-streams-container').appendChild(display);
 };
@@ -47,7 +49,14 @@ const displayMaximizedMediaStream = (mediaStream) => {
     document.body.appendChild(display);
 };
 
-getMediaStream().then(displayMaximizedMediaStream);
+const maximizeMediaStream = (mediaStream) => {
+    $('.maximized-stream video').srcObject = mediaStream;
+};
+
+const highlightMediaStreamContainer = (container) => {
+    $('.maximized', container.parentNode).classList.remove('maximized');
+    container.classList.add('maximized');
+};
 
 const setupPeerConnection = async (peerId) => {
     const configuration = {
@@ -78,6 +87,19 @@ const setupPeerConnection = async (peerId) => {
 
     return connection;
 };
+
+
+getMediaStream().then(displayMaximizedMediaStream);
+
+$('.minimized-streams-container').addEventListener('click', (e) => {
+    const mediaStreamContainer = e.target.closest('.minimized-stream');
+    if (mediaStreamContainer) {
+        const mediaStream = $('video', mediaStreamContainer).srcObject;
+        maximizeMediaStream(mediaStream);
+        highlightMediaStreamContainer(mediaStreamContainer);
+    }
+});
+
 
 socket.on('peerconnect', async (peerId) => {
     const connection = await setupPeerConnection(peerId);
