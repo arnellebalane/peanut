@@ -62,7 +62,8 @@ const setupPeerConnection = async (peerId) => {
     peers[peerId] = connection;
 
     const mediaStream = await getMediaStream();
-    const noLocalMediaStream = document.querySelector('div:not([data-key])') === null;
+    const localMediaStreamSelector = '.minimized-stream:not([data-key])';
+    const noLocalMediaStream = document.querySelector(localMediaStreamSelector) === null;
     if (noLocalMediaStream) {
         displayMediaStream(mediaStream);
     }
@@ -114,4 +115,7 @@ socket.on('peericecandidate', async ({ peerId, data }) => {
 socket.on('peerdisconnect', (peerId) => {
     delete peers[peerId];
     document.querySelector(`div[data-key="${peerId}"]`).remove();
+    if (Object.keys(peers).length === 0) {
+        document.querySelector('.minimized-stream').remove();
+    }
 });
