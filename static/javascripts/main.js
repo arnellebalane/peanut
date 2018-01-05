@@ -63,7 +63,7 @@ const setupPeerConnection = async (peerId) => {
         iceServers: [{
             url: 'stun:stun.l.google.com:19302'
         }, {
-            url: 'turn:playground.arnellebalane.com:3478',
+            url: 'turn:peanut.arnelle.me:3478',
             username: 'turnuser',
             credential: 'turnpassword'
         }]
