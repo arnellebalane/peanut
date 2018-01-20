@@ -59,16 +59,23 @@ const highlightMediaStreamContainer = (container) => {
 };
 
 const setupPeerConnection = async (peerId) => {
-    const configuration = {
-        iceServers: [{
-            url: 'stun:stun.l.google.com:19302'
-        }, {
-            url: 'turn:peanut.arnelle.me:3478',
-            username: 'turnuser',
-            credential: 'turnpassword'
-        }]
-    };
-    const connection = new PeerConnection(configuration);
+    const iceServers = [{
+        url: 'stun:stun.l.google.com:19302'
+    }];
+
+    try {
+        const credentialsEndpoint = 'https://turncm.arnellebalane.com/credentials?username=arnellebalane';
+        const credential = await fetch(credentialsEndpoint).then((response) => response.json());
+        credential.uris.forEach((uri) => iceServers.push({
+            url: uri,
+            username: credential.username,
+            credential: credential.password
+        }));
+    } catch (e) {
+        console.error(e);
+    }
+
+    const connection = new PeerConnection({ iceServers });
     peers[peerId] = connection;
 
     const mediaStream = await getMediaStream();
